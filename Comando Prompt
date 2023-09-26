@@ -1,0 +1,2 @@
+ls
+gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a
