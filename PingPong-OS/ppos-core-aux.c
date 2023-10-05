@@ -1,6 +1,9 @@
 #include "ppos.h"
 #include "ppos-core-globals.h"
 
+// PROFESSOR: Marco Aurélio Wehrmeister
+// DISCIPLINA: Sistemas Operacionais - S73
+// ALUNOS: Ricardo Henrique Pires dos Reis, Maria Gabriela Rodrigues Policarpo
 
 // ****************************************************************************
 // Coloque aqui as suas modificações, p.ex. includes, defines variáveis, 
@@ -8,7 +11,6 @@
 
 
 // ****************************************************************************
-
 
 
 void before_ppos_init () {
