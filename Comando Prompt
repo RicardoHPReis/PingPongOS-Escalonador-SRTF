@@ -1,2 +1,19 @@
-ls
-gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a
+- É preciso instalar o compilador GCC para linguagem C (Pra colar os comandos no terminal, utilize o Ctrl+Shift-V)
+    sudo apt update
+    sudo apt install build-essential
+    gcc --version (Para verificar se o GCC foi instalado)
+
+- Após isso, abra a pasta do trabalho no terminal e rode esse comando para rodar o trabalho
+    gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a
+
+- Instalação do Git:
+    sudo apt-get install git
+    git config --global user.name "nome do usuario"
+    git config --global user.email "email do usuario"
+    git clone https://github.com/RicardoHPReis/pingpong-os.git
+
+- Comandos do Git:
+    git pull origin main
+    git add .
+    git commit -m "Descrição das mudanças"
+    git push origin main
