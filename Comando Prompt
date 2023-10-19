@@ -3,8 +3,9 @@
     sudo apt install build-essential
     gcc --version (Para verificar se o GCC foi instalado)
 
-- Após isso, abra a pasta do trabalho no terminal e rode esse comando para rodar o trabalho
-    gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a
+- Após isso, abra a pasta do trabalho no terminal e rode esse comando para rodar o trabalho. (No Replit, é preciso por -O0 no final)
+    gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a -O0
+	gcc -o ppos ppos-core-aux.c pingpong-scheduler-srtf.c libppos_static.a -O0
 
 - Instalação do Git:
     sudo apt-get install git
