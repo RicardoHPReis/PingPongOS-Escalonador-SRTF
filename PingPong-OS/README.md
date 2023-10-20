@@ -1,6 +1,18 @@
 # Passos para a execução do Trabalho
+## Replit
+1. Abra o local da pasta do trabalho.
+   - No Replit: `cd PingPong-OS`
+2. Rode o seguinte comando no sistema, de acordo com o compilador de linguagem C:
+   - No Replit: `gcc -o ppos ppos-core-aux.c pingpong-scheduler-srtf.c libppos_static.a -O0`
+3. Em seguida, rode o executável:
+   - `./ppos`
+
+## Ambiente Linux Padrão
+
 1. Utilize um sistema operacional Linux.
-2. Abre o prompt de comando.
-3. Abre o local da pasta do trabalho.
-4. Rode o seguinte comando no sistema, de acordo com o compilador de linguagem C:
-   - Em GCC: `gcc -o ppos-test ppos-core-aux.c pingpong-preempcao.c libppos_static.a`
+2. Abra o prompt de comando.
+3. Abra o local da pasta do trabalho.
+5. Rode o seguinte comando no sistema, de acordo com o compilador de linguagem C:
+   - No GCC: `gcc -o ppos ppos-core-aux.c pingpong-scheduler-srtf.c libppos_static.a`
+6. Em seguida, rode o executável:
+   - `./ppos`

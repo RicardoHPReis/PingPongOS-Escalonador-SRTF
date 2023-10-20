@@ -2,6 +2,12 @@
 // Prof. Carlos A. Maziero, DINF UFPR
 // Versão 1.1 -- Julho de 2016
 
+// Mudanças feitas para o trabalho.
+// PROFESSOR: Marco Aurélio Wehrmeister
+// DISCIPLINA: Sistemas Operacionais - S73
+// ALUNOS: Ricardo Henrique Pires dos Reis, Maria Gabriela Rodrigues Policarpo
+
+
 // Estruturas de dados internas do sistema operacional
 
 #ifndef __PPOS_DATA__
@@ -9,6 +15,8 @@
 
 #include <stdio.h>
 #include <ucontext.h>		// biblioteca POSIX de trocas de contexto
+#include <string.h>
+#include <unistd.h>
 #include <time.h>
 #include "queue.h"			// biblioteca de filas genéricas
 

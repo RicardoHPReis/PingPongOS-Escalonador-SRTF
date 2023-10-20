@@ -67,6 +67,7 @@ void after_task_create (task_t *task ) {
 	#ifdef DEBUG
 		printf("\ntask_create - AFTER - [%d]", task->id);
 	#endif
+	memcpy(&task->mensagem, "Tarefa CRIADA\0", strlen("Tarefa CRIADA\0"));
 }
 
 void before_task_exit () {
@@ -74,13 +75,15 @@ void before_task_exit () {
 	#ifdef DEBUG
 		printf("\ntask_exit - BEFORE - [%d]", taskExec->id);
 	#endif
+	memcpy(&taskExec->mensagem, "Vai sair da tarefa\0", strlen("Vai sair da tarefa\0"));
 }
 
 void after_task_exit () {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_exit - AFTER- [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_exit - AFTER- [%d]", taskExec->id);
+	#endif
+	memcpy(&taskExec->mensagem, "SAIU da tarefa\0", strlen("SAIU da tarefa\0"));
 }
 
 void before_task_switch ( task_t *task ) {
