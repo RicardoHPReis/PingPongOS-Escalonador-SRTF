@@ -45,20 +45,20 @@ void Body(void *arg)
     	end_time--;
 		if ((last_printed_line + 5) <= systime())
 		{
-			printf("[%d]\t%s: interacao %d\t\t%d\n", systime(), (char *)arg, end_time, taskExec->running_time);
+			printf("[%d]\t%s: interacao %d\t\t%d\n", systime(), (char*) arg, end_time, taskExec->running_time);
 			last_printed_line = systime();
 		}
 
 		if ((last_created_task != systime()) && (systime() % 100) == 0)
 		{
-		last_created_task = systime();
-		// cria uma tarefa com prioridade mais alta
-		sprintf(new_task_name, "NEWTask[%2d]", new_tasks_count);
-		printf("Criando NOVA tarefa: %s\n", new_task_name);
-		task_create(&new_user_tasks[new_tasks_count], Body, &new_task_name);
-		task_set_eet(&new_user_tasks[new_tasks_count], 15);
-		new_tasks_count++;
-		task_yield();
+			last_created_task = systime();
+			// cria uma tarefa com prioridade mais alta
+			sprintf(new_task_name, "NEWTask[%2d]", new_tasks_count);
+			printf("Criando NOVA tarefa: %s\n", new_task_name);
+			task_create(&new_user_tasks[new_tasks_count], Body, &new_task_name);
+			task_set_eet(&new_user_tasks[new_tasks_count], 15);
+			new_tasks_count++;
+			task_yield();
     	}
 	}
 	printf("[%d]\t%s: fim\n", systime(), (char *)arg);
@@ -76,10 +76,12 @@ int main(int argc, char *argv[])
   	// waiting for the first microsecond
   	while (systime() <= 0)
     	;
+
   	// estimate how many iterations is a microsecond
   	aux_time = systime() + 1;
   	while (systime() < aux_time)
 		one_tick++;
+
 	// adjusting value
 	// one_tick = (one_tick*90)/100;
   	printf("Loop iterations to microseconds = %d\n", one_tick);

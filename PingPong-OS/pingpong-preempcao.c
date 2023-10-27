@@ -44,14 +44,12 @@ int main (int argc, char *argv[])
 	printf ("main: inicio\n");
 
 	ppos_init ();
-	printf("\n%s\n", Pang.mensagem);
 
 	task_create (&Pang, Body, "    Pang");
 	task_create (&Peng, Body, "        Peng");
 	task_create (&Ping, Body, "            Ping");
 	task_create (&Pong, Body, "                Pong");
 	task_create (&Pung, Body, "                    Pung");
-	printf("\n%s\n", Pang.mensagem);
 
 	task_join(&Pang);
 	task_join(&Peng);

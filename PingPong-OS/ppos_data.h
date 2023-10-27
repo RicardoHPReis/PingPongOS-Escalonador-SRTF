@@ -14,6 +14,7 @@
 #define __PPOS_DATA__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ucontext.h>		// biblioteca POSIX de trocas de contexto
 #include <string.h>
 #include <unistd.h>
@@ -31,13 +32,17 @@ typedef struct task_t
 	struct task_t* queue;
 	struct task_t* joinQueue;
 	int exitCode;
-	unsigned int awakeTime;         // used to store the time when it should be waked up
+	unsigned int awakeTime;         // usado para armazenar a hora em que deve ser acordado
 
-	// ...(outros campos deve ser adicionados APOS esse comentario)
-	char mensagem[20];
-	int eet, ret, running_time;
+	// ...(outros campos deve ser adicionados APÓS esse comentário)
+	int eet;						// Tempo estimado de execução da tarefa
+	int ret;						// Tempo restante para terminar a execução da tarefa
+	int running_time;				// Indica o tempo que a tarefa está rodando
+	int quantum;					// Indica o tempo que a tarefa está no processador
 
 } task_t;
+
+//**********************************************************
 
 // estrutura que define um semáforo
 typedef struct {

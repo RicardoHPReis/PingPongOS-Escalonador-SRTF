@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 // Interface do núcleo para as aplicações
 #ifndef __PPOS__
@@ -29,10 +27,6 @@
 #include "ppos_data.h"		// estruturas de dados necessárias
 
 // funções gerais ==============================================================
-
-void task_set_eet (task_t *task, int et); //Função Requisitada
-int task_get_eet(task_t *task); //Função Requisitada
-int task_get_ret(task_t *task); //Função Requisitada
 
 /*
 *** IMPORTANTE ***
