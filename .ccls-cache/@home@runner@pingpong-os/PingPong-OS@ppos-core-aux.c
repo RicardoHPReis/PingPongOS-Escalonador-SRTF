@@ -11,11 +11,11 @@
 #include <sys/time.h>
 #include <signal.h>
 
-struct sigaction action;
-struct itimerval timer ;
-
 #define QUANTUM 20
-#define DEBUG 1
+// #define DEBUG 1
+
+struct sigaction action;
+struct itimerval timer;
 
 void task_set_eet (task_t *task, int et)
 {
@@ -41,8 +41,12 @@ int task_get_eet(task_t *task) {
 
 int task_get_ret(task_t *task) {
     if (task == NULL)
+	{
+		//taskExec->ret = taskExec->eet - taskExec->running_time;
 		return taskExec->ret;
+	}
 
+	//task->ret = task->eet - task->running_time;
     return task->ret;
 }
 
@@ -65,48 +69,63 @@ void verificaVariaveisGlobais()
 	printf("systemTime: %d\n\n", systemTime);
 }
 
-task_t* scheduler() {
-	int isCurrent = 1;
-	task_t* menorTarefa = NULL;
-	task_t* proximaTarefa = readyQueue->next;
+// task_t *scheduler() {
+//     if(readyQueue != NULL) {
+//     	task_t * proxima_tarefa = readyQueue;
+//         task_t * aux = readyQueue->next; 
+//         int shortest_time = taskExec->ret;
+// 		while(aux != readyQueue)
+// 		{
+// 	    	if (aux->ret < shortest_time) {		
+// 	            proxima_tarefa = aux; 
+// 	        	shortest_time = aux->ret; 
+// 	        	// printf("eet %d e ret %d ", taskExec->eet, taskExec->ret);
+// 			}
+//       		aux = aux->next;
+// 		} 
+//     	proxima_tarefa->activations++;
+// 		return proxima_tarefa;
+// 	}
+// 	return taskExec;
+// }
 
-	if(countTasks >= 1) 
-	{		
-		for(int i=1; i <= countTasks; i++)
+task_t *scheduler() {
+  task_t * proxima_tarefa = readyQueue;
+    if(readyQueue == NULL) 
+    	return taskExec; 
+    else 
+	{  
+        task_t * aux = readyQueue; 
+        int shortest_time = taskExec->ret;
+	    while(aux != readyQueue)
 		{
-			if((proximaTarefa->eet < taskExec->ret && proximaTarefa->state == 'r') 
-				|| (taskExec->state == 'e' || taskExec->quantum == 0))
-			{
-				printf("\nA nova tarefa é menor\n");
-				menorTarefa = proximaTarefa;
-				isCurrent = 0;
-			}
-			printf("O atual é menor, vai para o próximo\n");
-			proximaTarefa = proximaTarefa->next;
+		    if (aux->eet < shortest_time) {		
+		    	shortest_time = aux->eet;
+		    	proxima_tarefa = aux;
+		    }
+		    aux = aux->next;
 		}
-	}
-	
-	if(isCurrent)
-	{
-		return taskExec;
-	}
-	else
-	{
-		return menorTarefa;
-	}
+	} 
+	//proxima_tarefa->activations++;
+    return proxima_tarefa;
 }
 
-void tratador_tempo (int signum)
-{
-	if(countTasks >= 1)
-	{
+
+void tratador_tempo(int signum) {
+ 	systemTime++;
+	if(taskExec != NULL) {
+	    taskExec->running_time++;
+	    taskExec->ret--;
+	}
+
+	if(taskExec!=taskDisp && taskExec->running_time > QUANTUM && taskExec != taskMain) {
 		taskExec->quantum--;
-		taskExec->running_time++;
-		
-		if(taskExec->quantum == 0)
+		//printf("Quantum: %d e Task %d \n", taskExec->quantum, taskExec->id);
+		if(taskExec->quantum == 0) 
 		{
-			printf("\nQuantum zerou\n");
-			task_yield();
+			//printf("Quantum zerou\n\n");
+			//task_yield();
+			taskExec->activations++;
 		}
 	}
 }
@@ -124,8 +143,10 @@ void temporizador ()
 	}
 
 	// ajusta valores do temporizador
-	timer.it_value.tv_usec = 200000;			// primeiro disparo, em micro-segundos
-	timer.it_interval.tv_usec = 200000;			// disparos subsequentes, em micro-segundos
+	timer.it_value.tv_usec =  1000;//200000;			// primeiro disparo, em micro-segundos
+	timer.it_value.tv_sec = 0;
+	timer.it_interval.tv_usec = 1000; //200000;			// disparos subsequentes, em micro-segundos
+	timer.it_value.tv_sec = 0; 
 	
 	// arma o temporizador ITIMER_REAL (vide man setitimer)
 	if (setitimer (ITIMER_REAL, &timer, 0) < 0)
@@ -166,11 +187,16 @@ void before_task_create (task_t *task) {
 void after_task_create (task_t *task ) {
 	// put your customization here
 	#ifdef DEBUG
-		printf("\ntask_create - AFTER - [%d]", task->id);
+		printf("\ntask_create - AFTER - [%d]\n", task->id);
 	#endif
-
 	systemTime++;
-	task_set_eet(task, 99999);
+	if(task!= NULL) 
+	{
+	    task_set_eet(task, 99999);
+	    task->quantum = QUANTUM;
+	    task->activations = 0;
+	}
+	//task->execution_time = systime();
 }
 
 void before_task_exit () {
@@ -178,7 +204,7 @@ void before_task_exit () {
 	#ifdef DEBUG
 		printf("\ntask_exit - BEFORE - [%d]", taskExec->id);
 	#endif
-	printf("Antes de sair da tarefa\n");
+	taskExec->execution_time = systime() - taskExec->execution_time;
 }
 
 void after_task_exit () {
@@ -186,7 +212,11 @@ void after_task_exit () {
 	#ifdef DEBUG
 		printf("\ntask_exit - AFTER- [%d]", taskExec->id);
 	#endif
-	printf("Saiu da tarefa\n");
+	printf("Task %d exit: Execution time: %d ms; Processor time: %d ms; %d activations\n\n",
+		taskExec->id,
+		taskExec->execution_time,
+		taskExec->running_time,
+		taskExec->activations);
 }
 
 void before_task_switch ( task_t *task ) {
@@ -198,6 +228,7 @@ void before_task_switch ( task_t *task ) {
 
 void after_task_switch ( task_t *task ) {
 	// put your customization here
+	task->quantum = QUANTUM;
 	#ifdef DEBUG
 		printf("\ntask_switch - AFTER - [%d -> %d]", taskExec->id, task->id);
 	#endif
@@ -207,7 +238,7 @@ void before_task_yield () {
 	// put your customization here
 	#ifdef DEBUG
 		printf("\ntask_yield - BEFORE - [%d]", taskExec->id);
-	#endif
+	#endif 
 }
 
 void after_task_yield () {
@@ -215,7 +246,6 @@ void after_task_yield () {
 	#ifdef DEBUG
 		printf("\ntask_yield - AFTER - [%d]", taskExec->id);
 	#endif
-	taskExec->quantum = QUANTUM;
 }
 
 void before_task_suspend( task_t *task ) {
@@ -223,6 +253,7 @@ void before_task_suspend( task_t *task ) {
 #ifdef DEBUG
 	printf("\ntask_suspend - BEFORE - [%d]", task->id);
 #endif
+
 }
 
 void after_task_suspend( task_t *task ) {
