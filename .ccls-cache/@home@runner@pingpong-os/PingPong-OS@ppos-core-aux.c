@@ -90,42 +90,42 @@ void verificaVariaveisGlobais()
 // }
 
 task_t *scheduler() {
-  task_t * proxima_tarefa = readyQueue;
-    if(readyQueue == NULL) 
-    	return taskExec; 
-    else 
-	{  
-        task_t * aux = readyQueue; 
-        int shortest_time = taskExec->ret;
-	    while(aux != readyQueue)
+	task_t * proxima_tarefa = readyQueue;
+	task_t * aux = readyQueue; 
+    int shortest_time = taskExec->ret;
+  	if(readyQueue == NULL) 
+		return taskExec;
+	else
+	{
+		do
 		{
-		    if (aux->eet < shortest_time) {		
-		    	shortest_time = aux->eet;
-		    	proxima_tarefa = aux;
-		    }
-		    aux = aux->next;
+			if (aux->eet < shortest_time && aux != taskMain) {	 
+				shortest_time = aux->eet;
+				//printf("Trocou %d -> %d", aux->id, proxima_tarefa->id);
+				proxima_tarefa = aux;
+			}
+			aux = aux->next;
 		}
-	} 
-	//proxima_tarefa->activations++;
+		while(aux != readyQueue);
+	}	
     return proxima_tarefa;
 }
-
 
 void tratador_tempo(int signum) {
  	systemTime++;
 	if(taskExec != NULL) {
 	    taskExec->running_time++;
+      taskExec->execution_time++;
 	    taskExec->ret--;
 	}
 
-	if(taskExec!=taskDisp && taskExec->running_time > QUANTUM && taskExec != taskMain) {
+	if(taskExec != taskDisp && taskExec != taskMain) {
 		taskExec->quantum--;
 		//printf("Quantum: %d e Task %d \n", taskExec->quantum, taskExec->id);
-		if(taskExec->quantum == 0) 
+		if(taskExec->quantum == 0)
 		{
-			//printf("Quantum zerou\n\n");
-			//task_yield();
 			taskExec->activations++;
+			task_yield();
 		}
 	}
 }
@@ -143,10 +143,8 @@ void temporizador ()
 	}
 
 	// ajusta valores do temporizador
-	timer.it_value.tv_usec =  1000;//200000;			// primeiro disparo, em micro-segundos
-	timer.it_value.tv_sec = 0;
-	timer.it_interval.tv_usec = 1000; //200000;			// disparos subsequentes, em micro-segundos
-	timer.it_value.tv_sec = 0; 
+	timer.it_value.tv_usec =  1000;
+	timer.it_interval.tv_usec = 1000; 
 	
 	// arma o temporizador ITIMER_REAL (vide man setitimer)
 	if (setitimer (ITIMER_REAL, &timer, 0) < 0)
@@ -212,9 +210,9 @@ void after_task_exit () {
 	#ifdef DEBUG
 		printf("\ntask_exit - AFTER- [%d]", taskExec->id);
 	#endif
-	printf("Task %d exit: Execution time: %d ms; Processor time: %d ms; %d activations\n\n",
+	printf("\nTask %d exit: Execution time: %d ms; Processor time: %d ms; %d activations\n\n",
 		taskExec->id,
-		taskExec->execution_time,
+    	taskExec->execution_time,
 		taskExec->running_time,
 		taskExec->activations);
 }

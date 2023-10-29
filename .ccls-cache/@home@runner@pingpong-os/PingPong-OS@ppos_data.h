@@ -40,9 +40,7 @@ typedef struct task_t
 	int running_time;				// Indica o tempo que a tarefa está rodando
 	int quantum;					// Indica o tempo que a tarefa está no processador
 	int execution_time;
-	int processing_time;
-	int activations; 
-  int prio;
+	int activations;
 } task_t;
 
 //**********************************************************
