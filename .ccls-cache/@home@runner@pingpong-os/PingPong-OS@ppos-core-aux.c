@@ -16,6 +16,7 @@
 
 struct sigaction action;
 struct itimerval timer;
+int tempo = 0;
 
 void task_set_eet (task_t *task, int et)
 {
@@ -42,11 +43,9 @@ int task_get_eet(task_t *task) {
 int task_get_ret(task_t *task) {
     if (task == NULL)
 	{
-		//taskExec->ret = taskExec->eet - taskExec->running_time;
 		return taskExec->ret;
 	}
 
-	//task->ret = task->eet - task->running_time;
     return task->ret;
 }
 
@@ -69,30 +68,11 @@ void verificaVariaveisGlobais()
 	printf("systemTime: %d\n\n", systemTime);
 }
 
-// task_t *scheduler() {
-//     if(readyQueue != NULL) {
-//     	task_t * proxima_tarefa = readyQueue;
-//         task_t * aux = readyQueue->next; 
-//         int shortest_time = taskExec->ret;
-// 		while(aux != readyQueue)
-// 		{
-// 	    	if (aux->ret < shortest_time) {		
-// 	            proxima_tarefa = aux; 
-// 	        	shortest_time = aux->ret; 
-// 	        	// printf("eet %d e ret %d ", taskExec->eet, taskExec->ret);
-// 			}
-//       		aux = aux->next;
-// 		} 
-//     	proxima_tarefa->activations++;
-// 		return proxima_tarefa;
-// 	}
-// 	return taskExec;
-// }
-
 task_t *scheduler() {
 	task_t * proxima_tarefa = readyQueue;
 	task_t * aux = readyQueue; 
     int shortest_time = taskExec->ret;
+	
   	if(readyQueue == NULL) 
 		return taskExec;
 	else
@@ -101,30 +81,29 @@ task_t *scheduler() {
 		{
 			if (aux->eet < shortest_time && aux != taskMain) {	 
 				shortest_time = aux->eet;
-				//printf("Trocou %d -> %d", aux->id, proxima_tarefa->id);
 				proxima_tarefa = aux;
 			}
 			aux = aux->next;
 		}
 		while(aux != readyQueue);
-	}	
-    return proxima_tarefa;
+	}
+	if(proxima_tarefa->execution_time == 0)
+		proxima_tarefa->execution_time = systime();
+	
+	return proxima_tarefa;
 }
 
 void tratador_tempo(int signum) {
  	systemTime++;
 	if(taskExec != NULL) {
 	    taskExec->running_time++;
-      taskExec->execution_time++;
 	    taskExec->ret--;
 	}
 
 	if(taskExec != taskDisp && taskExec != taskMain) {
 		taskExec->quantum--;
-		//printf("Quantum: %d e Task %d \n", taskExec->quantum, taskExec->id);
 		if(taskExec->quantum == 0)
 		{
-			taskExec->activations++;
 			task_yield();
 		}
 	}
@@ -156,7 +135,6 @@ void temporizador ()
 
 // ****************************************************************************
 
-
 void before_ppos_init () {
 	// put your customization here
 	#ifdef DEBUG
@@ -172,7 +150,7 @@ void after_ppos_init () {
 	#ifdef DEBUG
 		printf("\ninit - AFTER");
 	#endif
-	systemTime++;
+	//taskExec->execution_time++;
 }
 
 void before_task_create (task_t *task) {
@@ -187,30 +165,29 @@ void after_task_create (task_t *task ) {
 	#ifdef DEBUG
 		printf("\ntask_create - AFTER - [%d]\n", task->id);
 	#endif
-	systemTime++;
 	if(task!= NULL) 
 	{
 	    task_set_eet(task, 99999);
 	    task->quantum = QUANTUM;
+		task->execution_time = 0;
 	    task->activations = 0;
 	}
-	//task->execution_time = systime();
 }
 
 void before_task_exit () {
-	// put your customization here
 	#ifdef DEBUG
 		printf("\ntask_exit - BEFORE - [%d]", taskExec->id);
 	#endif
-	taskExec->execution_time = systime() - taskExec->execution_time;
+
 }
 
 void after_task_exit () {
-	// put your customization here
+  	taskExec->execution_time = systime() - taskExec->execution_time;
+	tempo = systime();
 	#ifdef DEBUG
 		printf("\ntask_exit - AFTER- [%d]", taskExec->id);
 	#endif
-	printf("\nTask %d exit: Execution time: %d ms; Processor time: %d ms; %d activations\n\n",
+	printf("\nTask %d exit: Execution time: %d ms; Processor time: %d ms; %d activations\n",
 		taskExec->id,
     	taskExec->execution_time,
 		taskExec->running_time,
@@ -219,6 +196,7 @@ void after_task_exit () {
 
 void before_task_switch ( task_t *task ) {
 	// put your customization here
+  task->activations++;
 	#ifdef DEBUG
 		printf("\ntask_switch - BEFORE - [%d -> %d]", taskExec->id, task->id);
 	#endif
@@ -248,34 +226,34 @@ void after_task_yield () {
 
 void before_task_suspend( task_t *task ) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_suspend - BEFORE - [%d]", task->id);
-#endif
-
+	#ifdef DEBUG
+		printf("\ntask_suspend - BEFORE - [%d]", task->id);
+	#endif
 }
 
 void after_task_suspend( task_t *task ) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_suspend - AFTER - [%d]", task->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_suspend - AFTER - [%d]", task->id);
+	#endif
 }
 
 void before_task_resume(task_t *task) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_resume - BEFORE - [%d]", task->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_resume - BEFORE - [%d]", task->id);
+	#endif
 }
 
 void after_task_resume(task_t *task) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_resume - AFTER - [%d]", task->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_resume - AFTER - [%d]", task->id);
+	#endif
 }
 
 void before_task_sleep () {
+
 	// put your customization here
 #ifdef DEBUG
 	printf("\ntask_sleep - BEFORE - [%d]", taskExec->id);
@@ -284,24 +262,24 @@ void before_task_sleep () {
 
 void after_task_sleep () {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_sleep - AFTER - [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_sleep - AFTER - [%d]", taskExec->id);
+	#endif
 }
 
 int before_task_join (task_t *task) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_join - BEFORE - [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_join - BEFORE - [%d]", taskExec->id);
+	#endif
 	return 0;
 }
 
 int after_task_join (task_t *task) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_join - AFTER - [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_join - AFTER - [%d]", taskExec->id);
+	#endif
 	return 0;
 }
 
@@ -309,9 +287,9 @@ int after_task_join (task_t *task) {
 
 int before_sem_create (semaphore_t *s, int value) {
 	// put your customization here
-#ifdef DEBUG
-	printf("\nsem_create - BEFORE - [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\nsem_create - BEFORE - [%d]", taskExec->id);
+	#endif
 	return 0;
 }
 
