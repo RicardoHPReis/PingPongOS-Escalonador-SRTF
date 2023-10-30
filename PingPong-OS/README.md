@@ -6,6 +6,8 @@
    - No Replit: `gcc -o ppos ppos-core-aux.c pingpong-scheduler-srtf.c libppos_static.a -O0`
 3. Em seguida, rode o executável:
    - `./ppos`
+4. Ou, utilizando o makefile use: `make pingpong`
+   - Em seguida `./pingpong`
 
 ## Ambiente Linux Padrão
 

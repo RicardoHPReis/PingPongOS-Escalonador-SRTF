@@ -23,7 +23,6 @@ void task_set_eet (task_t *task, int et)
 	if (task == NULL)
 	{
 		taskExec->eet = et;
-		taskExec->ret = et;
 	}
 	else
 	{
@@ -71,7 +70,7 @@ void verificaVariaveisGlobais()
 task_t *scheduler() {
 	task_t * proxima_tarefa = readyQueue;
 	task_t * aux = readyQueue; 
-    int shortest_time = taskExec->ret;
+  int shortest_time = task_get_ret(taskExec);
 	
   	if(readyQueue == NULL) 
 		return taskExec;
@@ -79,8 +78,8 @@ task_t *scheduler() {
 	{
 		do
 		{
-			if (aux->eet < shortest_time && aux != taskMain) {	 
-				shortest_time = aux->eet;
+			if (aux->ret < shortest_time && aux != taskMain) {
+				shortest_time = aux->ret;
 				proxima_tarefa = aux;
 			}
 			aux = aux->next;
@@ -150,7 +149,6 @@ void after_ppos_init () {
 	#ifdef DEBUG
 		printf("\ninit - AFTER");
 	#endif
-	//taskExec->execution_time++;
 }
 
 void before_task_create (task_t *task) {
@@ -175,13 +173,14 @@ void after_task_create (task_t *task ) {
 }
 
 void before_task_exit () {
+	// put your customization here
 	#ifdef DEBUG
 		printf("\ntask_exit - BEFORE - [%d]", taskExec->id);
 	#endif
-
 }
 
 void after_task_exit () {
+	// put your customization here
   	taskExec->execution_time = systime() - taskExec->execution_time;
 	tempo = systime();
 	#ifdef DEBUG
@@ -196,10 +195,11 @@ void after_task_exit () {
 
 void before_task_switch ( task_t *task ) {
 	// put your customization here
-  task->activations++;
 	#ifdef DEBUG
 		printf("\ntask_switch - BEFORE - [%d -> %d]", taskExec->id, task->id);
 	#endif
+	
+	task->activations++;
 }
 
 void after_task_switch ( task_t *task ) {
@@ -253,11 +253,10 @@ void after_task_resume(task_t *task) {
 }
 
 void before_task_sleep () {
-
 	// put your customization here
-#ifdef DEBUG
-	printf("\ntask_sleep - BEFORE - [%d]", taskExec->id);
-#endif
+	#ifdef DEBUG
+		printf("\ntask_sleep - BEFORE - [%d]", taskExec->id);
+	#endif
 }
 
 void after_task_sleep () {
