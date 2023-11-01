@@ -1,4 +1,4 @@
-# PingPong-OS #
+# PingPong-OS - Projeto A - Escalonador SRTF #
 ### Trabalho de Sistemas Operacionais
 Em português:
 Neste trabalho foi utilizado material do professor Carlos A. Maziero (DINF/UFPR) como base para implementação, porém os arquivos `ppos-core-aux.c` e `pingpong-scheduler-srtf.c` foram alterados por Ricardo Henrique e Maria Gabriela.\
